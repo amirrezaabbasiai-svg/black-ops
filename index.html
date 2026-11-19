@@ -109,7 +109,9 @@
                     <button id="start">
                         DEPLOY
                     </button>
-
+                    <button id="open-settings" class="secondary-menu-button">
+                        SETTINGS
+                    </button>
                     <div class="menu-footer">
                         <span class="status-dot"></span>
                         SYSTEM ONLINE
@@ -195,7 +197,105 @@
 
                 </div>
             </div>
+            <!-- SETTINGS VIEW -->
+<div id="settings-view" class="settings-view">
 
+    <div class="settings-header">
+        <div>
+            <div class="section-label">SYSTEM CONFIGURATION</div>
+            <h2>GAME SETTINGS</h2>
+        </div>
+
+        <button id="close-settings" class="settings-back-button">
+            BACK
+        </button>
+    </div>
+
+    <div class="settings-grid">
+
+        <!-- CONTROLS -->
+        <div class="settings-card">
+            <div class="settings-card-title">CONTROLS</div>
+
+            <div class="setting-row">
+                <label for="mouse-sensitivity">MOUSE SENSITIVITY</label>
+                <span id="sensitivity-value">1.0</span>
+            </div>
+
+            <input
+                id="mouse-sensitivity"
+                type="range"
+                min="0.2"
+                max="3"
+                step="0.1"
+                value="1"
+            >
+
+            <div class="setting-row">
+                <label for="invert-mouse">INVERT MOUSE Y</label>
+                <input id="invert-mouse" type="checkbox">
+            </div>
+        </div>
+
+        <!-- AUDIO -->
+        <div class="settings-card">
+            <div class="settings-card-title">AUDIO</div>
+
+            <div class="setting-row">
+                <label for="master-volume">MASTER VOLUME</label>
+                <span id="master-volume-value">100%</span>
+            </div>
+            <input id="master-volume" type="range" min="0" max="100" value="100">
+
+            <div class="setting-row">
+                <label for="effects-volume">SOUND EFFECTS</label>
+                <span id="effects-volume-value">100%</span>
+            </div>
+            <input id="effects-volume" type="range" min="0" max="100" value="100">
+
+            <div class="setting-row">
+                <label for="music-volume">MUSIC VOLUME</label>
+                <span id="music-volume-value">70%</span>
+            </div>
+            <input id="music-volume" type="range" min="0" max="100" value="70">
+        </div>
+
+        <!-- GRAPHICS -->
+        <div class="settings-card">
+            <div class="settings-card-title">GRAPHICS</div>
+
+            <div class="setting-row">
+                <label for="graphics-quality">GRAPHICS QUALITY</label>
+                <select id="graphics-quality">
+                    <option value="low">LOW</option>
+                    <option value="medium" selected>MEDIUM</option>
+                    <option value="high">HIGH</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
+                <label for="shadow-quality">SHADOW QUALITY</label>
+                <select id="shadow-quality">
+                    <option value="off">OFF</option>
+                    <option value="low" selected>LOW</option>
+                    <option value="high">HIGH</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
+                <label for="fullscreen">FULLSCREEN</label>
+                <input id="fullscreen" type="checkbox">
+            </div>
+        </div>
+
+    </div>
+
+    <div class="settings-footer">
+        <span>CHANGES WILL BE SAVED AUTOMATICALLY</span>
+        <span>BLOCK OPS // SYSTEM SETTINGS</span>
+    </div>
+
+</div>
             <div class="menu-bottom">
                 <span>BLOCK OPS</span>
                 <span>TACTICAL COMBAT SIMULATION</span>
