@@ -40,7 +40,194 @@ scene.add(sun);
 
 // CONTROLS
 const controls = new PointerLockControls(camera, document.body);
+// ==========================================
+// SETTINGS UI REFERENCES
+// ==========================================
 
+const settingsView = document.getElementById('settings-view');
+const menuContent = document.querySelector('.menu-content');
+
+const openSettingsButton = document.getElementById('open-settings');
+const closeSettingsButton = document.getElementById('close-settings');
+
+const sensitivityInput = document.getElementById('mouse-sensitivity');
+const sensitivityValue = document.getElementById('sensitivity-value');
+
+const graphicsSelect = document.getElementById('graphics-quality');
+const shadowSelect = document.getElementById('shadow-quality');
+const fullscreenInput = document.getElementById('fullscreen');
+
+const SETTINGS_KEY = 'blockOpsSettings';
+
+const defaultSettings = {
+    sensitivity: 1,
+    graphics: 'medium',
+    shadows: 'low',
+    fullscreen: false
+};
+
+let gameSettings = { ...defaultSettings };
+
+function openSettings() {
+    menuContent.style.display = 'none';
+    settingsView.classList.add('active');
+}
+
+function closeSettings() {
+    settingsView.classList.remove('active');
+    menuContent.style.display = '';
+}
+
+openSettingsButton.addEventListener('click', openSettings);
+closeSettingsButton.addEventListener('click', closeSettings);
+// ==========================================
+// SETTINGS SYSTEM
+// ==========================================
+
+function saveSettings() {
+    localStorage.setItem(
+        SETTINGS_KEY,
+        JSON.stringify(gameSettings)
+    );
+}
+
+function loadSettings() {
+    try {
+        const saved = localStorage.getItem(SETTINGS_KEY);
+
+        if (saved) {
+            gameSettings = {
+                ...defaultSettings,
+                ...JSON.parse(saved)
+            };
+        }
+    } catch (error) {
+        console.warn('Could not load game settings:', error);
+        gameSettings = { ...defaultSettings };
+    }
+}
+
+function applyGraphicsSettings() {
+
+    // Graphics quality controls rendering resolution.
+    const pixelRatios = {
+        low: 0.8,
+        medium: 1.2,
+        high: Math.min(devicePixelRatio, 1.7)
+    };
+
+    const ratio =
+        pixelRatios[gameSettings.graphics] ?? pixelRatios.medium;
+
+    renderer.setPixelRatio(ratio);
+    renderer.setSize(innerWidth, innerHeight);
+
+    // Shadow quality controls shadow map resolution.
+    const shadowSettings = {
+        off: { enabled: false, resolution: 512 },
+        low: { enabled: true, resolution: 1024 },
+        high: { enabled: true, resolution: 2048 }
+    };
+
+    const shadow =
+        shadowSettings[gameSettings.shadows] ?? shadowSettings.low;
+
+    renderer.shadowMap.enabled = shadow.enabled;
+    sun.castShadow = shadow.enabled;
+
+    sun.shadow.mapSize.set(
+        shadow.resolution,
+        shadow.resolution
+    );
+
+    if (sun.shadow.map) {
+        sun.shadow.map.dispose();
+        sun.shadow.map = null;
+    }
+
+    sun.shadow.needsUpdate = true;
+    renderer.shadowMap.needsUpdate = true;
+}
+
+function applySettings() {
+
+    // Mouse sensitivity
+    controls.pointerSpeed = gameSettings.sensitivity;
+
+    // Graphics
+    applyGraphicsSettings();
+
+    // Update settings UI
+    sensitivityInput.value = gameSettings.sensitivity;
+    sensitivityValue.textContent =
+        Number(gameSettings.sensitivity).toFixed(1);
+
+    graphicsSelect.value = gameSettings.graphics;
+    shadowSelect.value = gameSettings.shadows;
+    fullscreenInput.checked = gameSettings.fullscreen;
+}
+
+// Load settings when the game starts.
+loadSettings();
+applySettings();
+
+// Sensitivity
+sensitivityInput.addEventListener('input', () => {
+    gameSettings.sensitivity = Number(sensitivityInput.value);
+
+    sensitivityValue.textContent =
+        gameSettings.sensitivity.toFixed(1);
+
+    controls.pointerSpeed = gameSettings.sensitivity;
+    saveSettings();
+});
+
+// Graphics quality
+graphicsSelect.addEventListener('change', () => {
+    gameSettings.graphics = graphicsSelect.value;
+
+    applyGraphicsSettings();
+    saveSettings();
+});
+
+// Shadow quality
+shadowSelect.addEventListener('change', () => {
+    gameSettings.shadows = shadowSelect.value;
+
+    applyGraphicsSettings();
+    saveSettings();
+});
+
+// Fullscreen
+fullscreenInput.addEventListener('change', async () => {
+    try {
+        if (fullscreenInput.checked) {
+            await document.documentElement.requestFullscreen();
+        } else if (document.fullscreenElement) {
+            await document.exitFullscreen();
+        }
+
+        gameSettings.fullscreen =
+            Boolean(document.fullscreenElement);
+
+        saveSettings();
+
+    } catch (error) {
+        console.warn('Fullscreen request failed:', error);
+
+        fullscreenInput.checked =
+            Boolean(document.fullscreenElement);
+    }
+});
+
+// Keep fullscreen checkbox synchronized.
+document.addEventListener('fullscreenchange', () => {
+    gameSettings.fullscreen =
+        Boolean(document.fullscreenElement);
+
+    fullscreenInput.checked = gameSettings.fullscreen;
+    saveSettings();
+});
 const overlay = document.getElementById('overlay');
 const startButton = document.getElementById('start');
 const menuHeading = document.getElementById('menu-heading');
