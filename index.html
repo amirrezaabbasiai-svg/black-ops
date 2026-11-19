@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOCK OPS</title>
+
+    <link rel="stylesheet" href="./style.css">
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+
+<body>
+
+    <!-- GAME HUD -->
+    <div id="hud">
+
+        <!-- TOP LEFT -->
+        <div class="top-left">
+            <div class="brand">BLOCK <span>OPS</span></div>
+            <div id="speed">SPEED: 0</div>
+        </div>
+
+        <!-- WAVE HUD -->
+        <div id="wave-hud">
+            <div class="wave-title">
+                WAVE <span id="wave-number">1</span>
+            </div>
+
+            <div class="wave-enemies">
+                ENEMIES LEFT:
+                <span id="enemies-remaining">4</span>
+            </div>
+
+            <div id="wave-status">
+                ELIMINATE ALL ENEMIES
+            </div>
+        </div>
+
+        <!-- ACTION MESSAGE -->
+        <div id="action-label"></div>
+
+        <!-- CROSSHAIR -->
+        <div id="crosshair">
+            <div class="crosshair-top"></div>
+            <div class="crosshair-bottom"></div>
+            <div class="crosshair-left"></div>
+            <div class="crosshair-right"></div>
+        </div>
+
+        <!-- HIT MARKER -->
+        <div id="hit-marker">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- WEAPON HUD -->
+        <div id="weapon-hud">
+            <div class="weapon-name">ASSAULT RIFLE</div>
+
+            <div class="ammo-display">
+                <span id="ammo">30</span>
+                <span class="ammo-separator">/</span>
+                <span id="reserve">120</span>
+            </div>
+
+            <div id="reload-label">RELOADING...</div>
+        </div>
+
+    </div>
+
+    <!-- GAME OVERLAY -->
+        <!-- MAIN MENU / PAUSE MENU -->
+    <div id="overlay" class="visible">
+        <div class="overlay-panel">
+
+            <div class="menu-header">
+                <div class="menu-eyebrow">ARVAN EDGE GAMES // COMBAT DIVISION</div>
+
+                <div class="game-logo">
+                    BLOCK <span>OPS</span>
+                </div>
+
+                <div class="game-subtitle">SURVIVAL COMBAT</div>
+            </div>
+
+            <div class="menu-content">
+
+                <div class="menu-main">
+                    <div class="section-label">MISSION CONTROL</div>
+
+                    <h1 id="menu-heading">READY FOR DEPLOYMENT?</h1>
+
+                    <p id="menu-description">
+                        Enter the combat zone. Eliminate enemy forces.
+                        Survive every incoming wave.
+                    </p>
+
+                    <button id="start">
+                        DEPLOY
+                    </button>
+
+                    <div class="menu-footer">
+                        <span class="status-dot"></span>
+                        SYSTEM ONLINE
+                        <span class="footer-divider">/</span>
+                        SURVIVAL PROTOCOL
+                    </div>
+                </div>
+
+                <div class="menu-side">
+
+                    <div class="briefing-card">
+                        <div class="section-label">MISSION BRIEFING</div>
+
+                        <div class="briefing-title">OPERATION: LAST STAND</div>
+
+                        <p>
+                            Hostile forces are approaching your position.
+                            Eliminate all enemies to advance to the next wave.
+                            Each wave brings a larger threat.
+                        </p>
+
+                        <div class="briefing-stats">
+                            <div>
+                                <span>MODE</span>
+                                <strong>SURVIVAL</strong>
+                            </div>
+
+                            <div>
+                                <span>OBJECTIVE</span>
+                                <strong>ELIMINATE HOSTILES</strong>
+                            </div>
+
+                            <div>
+                                <span>DIFFICULTY</span>
+                                <strong>ESCALATING</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-card">
+                        <div class="section-label">COMBAT CONTROLS</div>
+
+                        <div class="control-row">
+                            <span>MOVE</span>
+                            <strong>W A S D</strong>
+                        </div>
+
+                        <div class="control-row">
+                            <span>SPRINT</span>
+                            <strong>SHIFT</strong>
+                        </div>
+
+                        <div class="control-row">
+                            <span>CROUCH</span>
+                            <strong>CTRL</strong>
+                        </div>
+
+                        <div class="control-row">
+                            <span>JUMP</span>
+                            <strong>SPACE</strong>
+                        </div>
+
+                        <div class="control-row">
+                            <span>AIM</span>
+                            <strong>MOUSE</strong>
+                        </div>
+
+                        <div class="control-row">
+                            <span>FIRE</span>
+                            <strong>LEFT CLICK</strong>
+                        </div>
+
+                        <div class="control-row">
+                            <span>RELOAD</span>
+                            <strong>R</strong>
+                        </div>
+
+                        <div class="control-row">
+                            <span>PAUSE</span>
+                            <strong>ESC</strong>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="menu-bottom">
+                <span>BLOCK OPS</span>
+                <span>TACTICAL COMBAT SIMULATION</span>
+                <span>VERSION 0.5</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- GAME SCRIPT -->
+    <script type="module" src="./src/main.js"></script>
+
+</body>
+</html>
