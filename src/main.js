@@ -41,6 +41,174 @@ scene.add(sun);
 // CONTROLS
 const controls = new PointerLockControls(camera, document.body);
 // ==========================================
+// BLOCK OPS — AUDIO ENGINE
+// ==========================================
+
+let audioContext = null;
+
+let masterGain = null;
+let effectsGain = null;
+
+function initializeAudio() {
+    if (audioContext) {
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        return;
+    }
+
+    const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+        console.warn('Web Audio API is not supported.');
+        return;
+    }
+
+    audioContext = new AudioContextClass();
+
+    masterGain = audioContext.createGain();
+    effectsGain = audioContext.createGain();
+
+    effectsGain.connect(masterGain);
+    masterGain.connect(audioContext.destination);
+
+    masterGain.gain.value = 1;
+    effectsGain.gain.value = 1;
+}
+
+function playGunshotSound() {
+    initializeAudio();
+    if (!audioContext) return;
+
+    const now = audioContext.currentTime;
+
+    // Noise burst
+    const bufferSize = audioContext.sampleRate * 0.18;
+    const buffer = audioContext.createBuffer(
+        1,
+        bufferSize,
+        audioContext.sampleRate
+    );
+
+    const data = buffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) *
+            Math.pow(1 - i / bufferSize, 2);
+    }
+
+    const noise = audioContext.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioContext.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1600;
+
+    const noiseVolume = audioContext.createGain();
+    noiseVolume.gain.setValueAtTime(0.75, now);
+    noiseVolume.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+    noise.connect(filter);
+    filter.connect(noiseVolume);
+    noiseVolume.connect(effectsGain);
+
+    noise.start(now);
+    noise.stop(now + 0.18);
+
+    // Low-frequency body
+    const bass = audioContext.createOscillator();
+    const bassVolume = audioContext.createGain();
+
+    bass.type = 'sine';
+    bass.frequency.setValueAtTime(110, now);
+    bass.frequency.exponentialRampToValueAtTime(42, now + 0.12);
+
+    bassVolume.gain.setValueAtTime(0.55, now);
+    bassVolume.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+    bass.connect(bassVolume);
+    bassVolume.connect(effectsGain);
+
+    bass.start(now);
+    bass.stop(now + 0.15);
+}
+
+function playReloadSound() {
+    initializeAudio();
+    if (!audioContext) return;
+
+    const now = audioContext.currentTime;
+
+    [0, 0.25, 0.85, 1.05].forEach((delay, index) => {
+        const oscillator = audioContext.createOscillator();
+        const volume = audioContext.createGain();
+
+        oscillator.type = 'square';
+        oscillator.frequency.value =
+            index % 2 === 0 ? 850 : 520;
+
+        volume.gain.setValueAtTime(0.0001, now + delay);
+        volume.gain.linearRampToValueAtTime(0.12, now + delay + 0.01);
+        volume.gain.exponentialRampToValueAtTime(
+            0.0001,
+            now + delay + 0.07
+        );
+
+        oscillator.connect(volume);
+        volume.connect(effectsGain);
+
+        oscillator.start(now + delay);
+        oscillator.stop(now + delay + 0.08);
+    });
+}
+
+function playEnemyShotSound() {
+    initializeAudio();
+    if (!audioContext) return;
+
+    const now = audioContext.currentTime;
+
+    const oscillator = audioContext.createOscillator();
+    const volume = audioContext.createGain();
+
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(180, now);
+    oscillator.frequency.exponentialRampToValueAtTime(75, now + 0.12);
+
+    volume.gain.setValueAtTime(0.16, now);
+    volume.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+    oscillator.connect(volume);
+    volume.connect(effectsGain);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.15);
+}
+
+function playPlayerHitSound() {
+    initializeAudio();
+    if (!audioContext) return;
+
+    const now = audioContext.currentTime;
+
+    const oscillator = audioContext.createOscillator();
+    const volume = audioContext.createGain();
+
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(130, now);
+    oscillator.frequency.exponentialRampToValueAtTime(55, now + 0.22);
+
+    volume.gain.setValueAtTime(0.2, now);
+    volume.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+
+    oscillator.connect(volume);
+    volume.connect(effectsGain);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.25);
+}
+// ==========================================
 // SETTINGS UI REFERENCES
 // ==========================================
 
@@ -1869,6 +2037,7 @@ function updateEnemyShooting(now) {
 
     if (now >= enemy.nextShotTime) {
       spawnEnemyProjectile(enemy);
+      playEnemyShotSound();
 
       enemy.nextShotTime =
         now + ENEMY_FIRE_INTERVAL + Math.random() * 350;
@@ -2664,6 +2833,7 @@ function startReload() {
   }
 
   isReloading = true;
+  playReloadSound();
   reloadEnd = performance.now() + RELOAD_MS;
   reloadLabel.textContent = 'RELOADING';
 }
@@ -2699,7 +2869,7 @@ function shoot() {
 
   lastShot = now;
   ammo--;
-
+  playGunshotSound();
   updateAmmo();
 
   weaponKick = Math.min(weaponKick + 0.075, 0.16);
@@ -2818,6 +2988,7 @@ function updateCombat(now, dt) {
       0,
       playerHealth - pendingPlayerDamage
     );
+    playPlayerHitSound();
 
     pendingPlayerDamage = 0;
 
